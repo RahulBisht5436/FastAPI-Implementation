@@ -1,5 +1,5 @@
 [project]
-name = "rangmanch"
+name = "dabbewale"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -7,13 +7,10 @@ authors = [
     { name = "Rahul bisht", email = "rahul.bisht@telgoo5.com" }
 ]
 requires-python = ">=3.14"
-dependencies = [
-    "fastapi[standard]>=0.141.1",
-    "sqlmodel>=0.0.42",
-]
+dependencies = []
 
 [project.scripts]
-rangmanch = "rangmanch:main"
+dabbewale = "dabbewale:main"
 
 [build-system]
 requires = ["uv_build>=0.12.6,<0.13.0"]
