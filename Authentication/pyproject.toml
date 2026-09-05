@@ -1,5 +1,5 @@
 [project]
-name = "dabbewale"
+name = "authentication"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -9,11 +9,10 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "fastapi[standard]>=0.141.1",
-    "sqlmodel>=0.0.42",
 ]
 
 [project.scripts]
-dabbewale = "dabbewale:main"
+authentication = "authentication:main"
 
 [build-system]
 requires = ["uv_build>=0.12.6,<0.13.0"]
