@@ -1,0 +1,33 @@
+[project]
+name = "vakil-vision"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Rahul bisht", email = "rahul.bisht@telgoo5.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi[standard]>=0.141.1",
+    "httpx>=0.28.1",
+    "langchain>=1.4.0",
+    "langchain-classic>=1.0.8",
+    "langchain-community>=0.4.2",
+    "langchain-core>=1.6.2",
+    "langchain-ollama>=0.3.0",
+    "langchain-openai>=1.6.0",
+    "langchain-qdrant>=1.1.0",
+    "langchain-text-splitters>=1.1.2",
+    "pymongo>=4.18.0",
+    "pypdf>=6.17.0",
+    "python-dotenv>=1.1.0",
+    "qdrant-client>=1.19.0",
+]
+
+[project.scripts]
+vakil-vision = "vakil_vision:main"
+vakil-vision-api = "vakil_vision.server:main"
+
+[build-system]
+requires = ["uv_build>=0.12.6,<0.13.0"]
+build-backend = "uv_build"

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vakil Vision</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div>
+        <h1>Vakil Vision</h1>
+        <p class="subtitle">Local AI contract analysis with Ollama</p>
+      </div>
+      <div id="health-badge" class="badge badge-loading">Checking LLM...</div>
+    </header>
+
+    <section class="controls card">
+      <div class="control-row">
+        <label>
+          Reasoning model
+          <select id="reasoning-model"></select>
+        </label>
+        <label>
+          Vision model
+          <select id="vision-model"></select>
+        </label>
+        <label>
+          Mode
+          <select id="mode">
+            <option value="analyze">Contract analysis</option>
+            <option value="chat">Free chat</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <main class="layout">
+      <section class="card chat-panel">
+        <div id="messages" class="messages">
+          <div class="message assistant">
+            Upload a contract image, PDF, or type a message. Analysis runs locally via Ollama.
+          </div>
+        </div>
+
+        <form id="chat-form" class="composer">
+          <label class="upload-btn">
+            Attach image
+            <input id="image-input" type="file" accept="image/*" hidden />
+          </label>
+          <div id="image-preview" class="image-preview hidden"></div>
+          <textarea
+            id="message-input"
+            rows="3"
+            placeholder="Ask about a clause, paste contract text, or attach a document image..."
+          ></textarea>
+          <div class="composer-actions">
+            <button type="submit" id="send-btn">Send</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="card side-panel">
+        <h2>Contract upload</h2>
+        <form id="upload-form" class="upload-form">
+          <input id="file-input" type="file" accept=".pdf,.txt,application/pdf,text/plain" />
+          <button type="submit" id="upload-btn">Analyze file</button>
+        </form>
+
+        <div id="analysis-output" class="analysis-output">
+          <p class="muted">Structured analysis will appear here.</p>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
