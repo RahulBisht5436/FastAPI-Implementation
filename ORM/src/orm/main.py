@@ -11,7 +11,7 @@ from src.orm.databaseConnection import engine, Base
 from contextlib import asynccontextmanager
 from Routes.user import router as user_router
 from Routes.login import router as login_router
-
+from Routes.newsFinder import router as news_finder_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -41,3 +41,4 @@ def read_root():
 # Mount route modules — each router defines its own prefix and tags
 app.include_router(user_router)
 app.include_router(login_router)
+app.include_router(news_finder_router)
