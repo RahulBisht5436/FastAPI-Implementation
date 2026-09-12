@@ -1,0 +1,34 @@
+services:
+
+  # PostgreSQL database — credentials match DB_URL in .env
+  db:
+    image: postgres:16
+    container_name: sqlalchemy_postgres
+    restart: always
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydatabase
+
+    ports:
+      - "5432:5432"  # expose to host so the FastAPI app can connect via localhost
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # persist data across container restarts
+
+  # Web UI for browsing tables — open http://localhost:8080
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
