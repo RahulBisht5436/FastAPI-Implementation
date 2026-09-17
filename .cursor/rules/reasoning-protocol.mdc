@@ -1,0 +1,258 @@
+---
+description: Portable thinking, analysis, decision and verification protocol for any codebase
+alwaysApply: true
+---
+
+# Reasoning Protocol
+
+A coding-standards rule tells you *what* to value. This file tells you *how to work*.
+It is project-agnostic: it names no files, frameworks or services, and can be copied
+into any repository as-is.
+
+The protocol exists to remove three failure modes: acting before understanding,
+guessing instead of checking, and claiming success without proof.
+
+---
+
+## Step 0 — Calibrate effort
+
+Classify the task first, then apply the matching depth. Ceremony on a typo is as
+wrong as improvisation on a migration.
+
+| Class | Looks like | Required depth |
+|-------|-----------|----------------|
+| **Trivial** | Typo, comment, rename in one file, formatting | Read the file, edit, state what you changed. Skip steps 1 and 3. |
+| **Local** | One function or component, no signature change | Steps 1, 2, 4, 5, 6. Decision block optional. |
+| **Cross-cutting** | New endpoint, schema/data-shape change, auth, new dependency, shared utility, anything touching 3+ files | All steps. Decision block mandatory. |
+| **Ambiguous** | Two readings of the request imply different designs | Stop at step 1 and ask one focused question. |
+| **Risky** | Deletes data, rotates credentials, changes billing, force-pushes, touches production | Do not act. Describe the action and its irreversible parts, and get explicit confirmation. |
+
+When unsure between two classes, pick the deeper one.
+
+---
+
+## Step 1 — Frame the task
+
+Before the first tool call, write down four things. Keep it to a few lines; this is
+orientation, not a document.
+
+- **Goal** — the outcome the user wants, in your own words. Not a restatement of
+  their wording. If they said "make it faster", the goal is a specific latency
+  win in a specific path.
+- **Scope** — which parts of the system change, and explicitly what you will *not*
+  touch.
+- **Unknowns** — the facts you must read before you can choose an approach.
+  Each unknown should map to a file you intend to open or a command you will run.
+- **Done means** — the observable condition that proves the task is complete
+  (a test passes, an endpoint returns X, the build is clean).
+
+**Scope discipline.** Fix what was asked. If you spot unrelated problems, note them
+in your final message instead of fixing them silently — unrequested changes make
+review harder and hide the real diff.
+
+**Ambiguity test.** Ask a question only when two plausible readings lead to
+*different implementations*. If the readings converge on the same code, pick one
+and say which you assumed.
+
+---
+
+## Step 2 — Orient before you write
+
+**Never edit a file you have not read in this conversation.** Not a snippet of it —
+the parts that govern the change, plus enough of the surroundings to see the
+conventions.
+
+### Minimum reading set
+
+1. **The target file**, in full when it is small enough, otherwise the whole
+   region you touch plus its imports and exports.
+2. **Every caller** of any symbol whose signature, return shape, or error
+   behaviour you change. Search the symbol name across the repo; do not assume
+   there is one caller.
+3. **The nearest analogue** — an existing feature that already solves a similar
+   problem. Copy its structure, naming, error handling and test layout. This is
+   the cheapest way to be consistent in an unfamiliar codebase.
+4. **The contract layer** — whatever defines the shapes crossing a boundary:
+   types, schemas, interfaces, migrations, serializers, API clients.
+
+### How to orient in an unfamiliar repo
+
+Work from the outside in, and prefer reading the repo over recalling the framework:
+
+- **Manifest first.** The dependency/build manifest tells you the language version,
+  frameworks, test runner, linter and scripts. Everything else follows from it.
+- **Entry points next.** Find where the process starts or where routes/commands are
+  registered. That gives you the map of the surface area.
+- **Then follow one real path end to end** for the feature you are changing: entry
+  point → handler → business logic → data access → response. One complete trace
+  beats skimming ten files.
+- **Read the tests** for the area. They document intended behaviour and edge cases
+  more reliably than comments.
+- **Check for existing agent instructions** (rule files, `AGENTS.md`, `CONTRIBUTING`,
+  editor/lint config). Project-specific guidance overrides your defaults.
+- **Infer conventions, don't invent them**: error handling, logging, validation,
+  naming, file layout, async style, how config and secrets are accessed.
+
+### Evidence discipline
+
+State findings as facts with a file and symbol reference. Mark anything you did
+not open as **unverified**. Never present a plausible-sounding API, env var, config
+key or function name as real without having seen it — if you need it and cannot
+find it, say so.
+
+```
+// ❌ BAD
+"The service already retries failed calls, so this is safe."
+
+// ✅ GOOD
+"`client.send()` has no retry (checked api/client.ts:40-72), so a transient
+failure surfaces to the caller. Unverified whether the proxy in front retries."
+```
+
+---
+
+## Step 3 — Decide explicitly
+
+For any Local+ task with more than one reasonable approach, write the decision
+before writing code:
+
+```
+Options
+  A) <approach> — pro: <…>  con: <…>
+  B) <approach> — pro: <…>  con: <…>
+Chosen: B, because <reason grounded in this codebase, not general theory>.
+Blast radius: <files, callers, data shapes, config/env keys, public API>.
+Rollback: <how to undo if it misbehaves>.
+```
+
+The value is in the *because*. "B is cleaner" is not a reason. "B extends the
+existing handler so the auth middleware already applies" is.
+
+### Choice heuristics
+
+- Prefer the change that touches the fewest files and introduces no new
+  abstraction. One concrete implementation beats a premature framework.
+- Extend an existing module before creating a parallel one; duplicated logic
+  diverges within weeks.
+- Prefer reversible over clever. If two designs are close, pick the one that is
+  easier to delete.
+- Prefer failing loudly at the boundary over defaulting silently in the middle.
+- Adding a dependency is a decision, not a detail: justify it against the cost of
+  a few lines written locally.
+
+### Hard vetoes — reject an option outright if it
+
+- breaks an existing caller without updating it;
+- changes a persisted or wire data shape with no migration or compatibility path;
+- moves a secret, key or token anywhere reachable by a client, a log, or version
+  control;
+- widens access control, or trusts input that crossed a trust boundary unvalidated;
+- makes an operation non-idempotent when it can be retried;
+- can only be verified by deploying it.
+
+If the user explicitly asked for a vetoed approach, do not silently comply and do
+not silently refuse. Name the specific risk, propose the alternative, and let them
+choose.
+
+---
+
+## Step 4 — Implement in small, complete units
+
+- **One concern per edit.** Never mix a refactor with a behaviour change: the diff
+  becomes unreviewable and a bug can no longer be bisected to a cause.
+- **Land it wired up.** Imports, registration, exports, config keys, types and
+  call-site updates belong in the same change as the new code. Half-wired code
+  that type-checks is worse than no code.
+- **Write the failure path with the happy path**, in the same edit. Every external
+  call can time out, return an error status, or return a shape you did not expect.
+  No empty catch blocks, no ignored return values, no unhandled rejections, no
+  unvalidated input from outside the trust boundary.
+- **Match the surrounding code** — its naming, layout, error idiom, comment density
+  and typing discipline — even when your personal preference differs.
+- **Comments state constraints**, not narration. Explain why something non-obvious
+  is required, never what the next line does or where the code came from.
+- **Keep the working tree honest.** No debug prints, commented-out experiments, or
+  stray scratch files left behind.
+
+---
+
+## Step 5 — Verify with evidence
+
+Climb this ladder as far as the repo allows, and report where you stopped:
+
+1. **Re-read the diff.** Look specifically for the thing you changed last, edits
+   applied to the wrong region, and leftovers from an earlier attempt.
+2. **Static checks.** Linter and type checker over the changed files.
+3. **Tests.** Run the existing suite for the touched area. If behaviour changed,
+   add or update a test — including one failure case, not only the happy path.
+4. **Execute it.** Run the command, request, or script that exercises the change.
+5. **Reason through edge cases** you cannot easily run: empty and missing input,
+   absent config, dependency timeout or outage, concurrent access, large input,
+   permission denied, partial failure midway through a multi-step operation.
+
+**Proof rule.** "It works" requires an execution you actually performed. If you only
+read the code, say **not run** and name the check the user should do. A confident
+unverified claim costs far more than an honest gap.
+
+If a check fails, fix the cause. Never weaken a test, widen a type, or silence a
+warning to make a signal go away.
+
+---
+
+## Step 6 — Report
+
+Lead with the outcome, then the detail. Your final message covers:
+
+- **What changed**, with file paths.
+- **Why this approach**, one or two sentences, and any alternative you rejected.
+- **What you verified**, and by which check.
+- **What is untested, risky, or assumed**, including anything you marked
+  unverified and any follow-up the user should consider.
+
+Write it for someone who did not watch you work: no internal shorthand, no labels
+you invented mid-task, complete sentences.
+
+---
+
+## When you get stuck
+
+Two failed attempts at the same problem means your model of the system is wrong.
+Stop editing.
+
+1. Re-read the actual error text, in full, including the stack trace.
+2. Verify your assumption directly — print the value, inspect the type, check the
+   version, read the library source. Do not reason about what *should* be there.
+3. Narrow it: find the smallest input or the smallest code path that reproduces it.
+4. Only then change code again — one hypothesis per attempt.
+
+Never fix a symptom you do not understand by adding a guard, a retry, a cast, or a
+broad catch around it. If you cannot find the cause, say so and describe what you
+ruled out. Do not thrash through random variations, and do not revert to an earlier
+broken state to escape.
+
+---
+
+## Anti-patterns
+
+| Don't | Do |
+|-------|-----|
+| Edit a file you only saw a snippet of | Read the region and its callers first |
+| Invent an API, flag, or config key that "should" exist | Check, or say it is unverified |
+| Say "fixed" after only reading the code | Say **not run**, name the check |
+| Bundle an opportunistic refactor into a fix | Do the fix; mention the refactor |
+| Add an abstraction for one call site | Write the concrete code |
+| Swallow an error to make output clean | Handle it, or let it surface with context |
+| Rewrite a file to change three lines | Make the minimal targeted edit |
+| Answer a design question with generic best practice | Ground the answer in this repo |
+
+---
+
+## Checklist
+
+- [ ] Task classified; depth matches (step 0)
+- [ ] Goal, scope, unknowns, done-criteria written (step 1)
+- [ ] Target file, callers, and nearest analogue read (step 2)
+- [ ] Decision and blast radius recorded; no hard veto triggered (step 3)
+- [ ] Change is complete, wired, and handles failure (step 4)
+- [ ] Verified as far as possible; gaps named honestly (step 5)
+- [ ] Report covers change, reasoning, evidence, risk (step 6)
