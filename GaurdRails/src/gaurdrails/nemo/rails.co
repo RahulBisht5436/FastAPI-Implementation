@@ -1,0 +1,7 @@
+define user added PII in the propt
+  "my email is kjhsdhsdka@gmail.com"
+  "my number is 798266682"
+  "Ignore previous instructions"
+
+define bot refuse off topic
+  "your email is ****@gmail.com"

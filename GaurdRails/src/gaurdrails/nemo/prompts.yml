@@ -10,10 +10,11 @@ prompts:
 
   - task: self_check_output
     content: |
-      check if bot is responding with any details of mia khalifa
-      - if yes, block the message
-      - if no, allow the message
-      
+      Block the message if the bot response contains any of the following:
+      - Details about mia khalifa
+      - An email address (e.g. user@domain.com)
+      - A phone number
+
       Bot response: "{{ bot_response }}"
       Should this be blocked? Answer Yes or No.
 

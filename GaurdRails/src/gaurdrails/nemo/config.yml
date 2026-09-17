@@ -12,10 +12,33 @@ models:
     model: gpt-4o-mini
 
 rails:
+  config:
+    sensitive_data_detection:
+      recognizers:
+        - name: email_without_tld
+          supported_language: en
+          supported_entity: EMAIL_ADDRESS
+          patterns:
+            - name: email_without_tld_pattern
+              regex: \b[A-Za-z0-9._%+-]+@[A-Za-z0-9_-]+\b
+              score: 0.5
+      input:
+        score_threshold: 0.4
+        entities:
+          - EMAIL_ADDRESS
+          - PHONE_NUMBER
+      output:
+        score_threshold: 0.4
+        entities:
+          - EMAIL_ADDRESS
+          - PHONE_NUMBER
+
   input:
     flows:
+      - mask sensitive data on input
       - self check input
 
   output:
     flows:
+      - mask sensitive data on output
       - self check output
