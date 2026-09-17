@@ -9,7 +9,9 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "fastapi[standard]>=0.141.1",
+    "langchain-openai>=1.6.2",
     "langgraph>=1.2.11",
+    "nemoguardrails>=0.24.1",
 ]
 
 [project.scripts]
