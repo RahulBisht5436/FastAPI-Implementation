@@ -22,6 +22,7 @@ def _build_llm() -> ChatOpenAI:
         default_headers=createHeaders(
             api_key=settings.portkey_api_key,
             provider=settings.portkey_provider,
+            config=settings.portkey_config_id
         ),
     )
 

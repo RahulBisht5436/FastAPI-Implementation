@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     # Portkey integration slug from the dashboard, e.g. @my-provider.
     portkey_provider: str
     default_llm_model: str = "gpt-4o-mini"
+    portkey_config_id: str | None = None
 
 
 @lru_cache
