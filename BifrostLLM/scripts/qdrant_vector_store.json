@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "type": "qdrant",
+  "ttl_seconds": 300,
+  "cache_by_model": true,
+  "cache_by_provider": true,
+  "config": {
+    "host": "qdrant",
+    "port": 6334,
+    "use_tls": false
+  }
+}

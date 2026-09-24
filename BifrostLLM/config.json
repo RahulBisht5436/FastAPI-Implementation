@@ -1,0 +1,31 @@
+{
+  "$schema": "https://www.getbifrost.ai/schema",
+  "vector_store": {
+    "enabled": true,
+    "type": "qdrant",
+    "config": {
+      "host": "qdrant",
+      "port": 6334,
+      "use_tls": false
+    }
+  },
+  "plugins": [
+    {
+      "enabled": true,
+      "name": "semantic_cache",
+      "config": {
+        "provider": "openai",
+        "embedding_model": "text-embedding-3-small",
+        "dimension": 1536,
+        "ttl": "5m",
+        "threshold": 0.8,
+        "conversation_history_threshold": 3,
+        "exclude_system_prompt": false,
+        "cache_by_model": true,
+        "cache_by_provider": true,
+        "vector_store_namespace": "BifrostSemanticCachePlugin",
+        "default_cache_key": "notebook-demo"
+      }
+    }
+  ]
+}

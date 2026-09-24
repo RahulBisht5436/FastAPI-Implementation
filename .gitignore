@@ -44,6 +44,10 @@ pnpm-debug.log*
 .env.*
 !.env.example
 
+# Local Bifrost / notebook artifacts (never commit copied gateway DBs)
+BifrostLLM/bifrost_config.db
+BifrostLLM/temp_config_check
+
 # IDE / editor
 .vscode/
 .idea/

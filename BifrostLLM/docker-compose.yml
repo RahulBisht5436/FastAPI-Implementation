@@ -4,12 +4,15 @@ services:
     image: maximhq/bifrost:latest
     container_name: bifrost
     restart: unless-stopped
+    depends_on:
+      - qdrant
 
     ports:
       - "8080:8080"
 
     volumes:
       - bifrost_data:/app/data
+      - ./config.json:/app/data/config.json:ro
 
   qdrant:
     image: qdrant/qdrant:latest

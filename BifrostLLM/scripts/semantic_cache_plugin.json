@@ -1,0 +1,18 @@
+{
+  "name": "semantic_cache",
+  "enabled": true,
+  "path": "",
+  "config": {
+    "provider": "openai",
+    "embedding_model": "text-embedding-3-small",
+    "dimension": 1536,
+    "ttl": "5m",
+    "threshold": 0.8,
+    "conversation_history_threshold": 3,
+    "exclude_system_prompt": false,
+    "cache_by_model": true,
+    "cache_by_provider": true,
+    "vector_store_namespace": "BifrostSemanticCachePlugin",
+    "default_cache_key": "notebook-demo"
+  }
+}

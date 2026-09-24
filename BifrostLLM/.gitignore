@@ -1,0 +1,20 @@
+# Secrets and local env
+.env
+.env.*
+!.env.example
+
+# Local databases and copied Bifrost state (may contain API keys)
+*.db
+*.db-shm
+*.db-wal
+bifrost_config.db
+temp_config_check
+
+# Python / notebooks
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+
+# Scratch / editor artifacts
+scripts/Untitled
+*.tmp
