@@ -1,0 +1,60 @@
+---
+description: Fixed 5-part structure (Hinglish-friendly) for answering any "explain this topic/code" request, ending with an interview/TL-ready summary
+alwaysApply: true
+---
+
+# Explanation Format
+
+## When this applies
+
+Use this format whenever the user asks to **explain** something: a topic, a concept,
+a piece of code, a file, a change you made, or a design decision. Triggers include
+"explain", "samjhao", "samjha do", "what is", "how does X work", "why did we do this".
+
+Do **not** use it for plain implementation requests with no explanation asked for.
+
+## Language
+
+- Section 1 is in **Hinglish** (Hindi in Roman script, mixed with English) by default.
+  Use Devanagari Hindi only if the user writes in Devanagari or asks for it.
+- Sections 2-4 may be Hinglish or English. Keep technical terms (function names,
+  API names, "idempotency", "cache", etc.) in English; never translate them.
+- Section 5 is always in **clear professional English**, because it is meant to be
+  said out loud in an interview or to a TL.
+
+## Required structure
+
+Use these five headings, in this order.
+
+### 1. Basic Idea (Samjho pehle)
+- What it is and what problem it solves, in simple words.
+- One real-world analogy if it helps.
+- Basic terms the user must know before the details. Keep it short, no code yet.
+
+### 2. Our Approach (Humne kya kiya aur kyun)
+- The approach taken (or recommended) in this codebase, and **why it is the best
+  choice here**, grounded in the actual code, not generic theory.
+- If the existing approach is not the best one, say so plainly and state the better
+  approach. Never defend a weak solution just because it already exists.
+
+### 3. Implementation Details (Andar kya ho raha hai)
+- Step-by-step walk-through of the real implementation: flow, key functions, data shapes.
+- Cite existing code with code references (`startLine:endLine:filepath`), not retyped copies.
+- Cover important edge cases, failure handling, security and performance points.
+
+### 4. Other Approaches (Brief)
+- 2-3 alternatives, one or two lines each: what it is, pro, con, and when you would
+  pick it instead. A short table is fine here.
+
+### 5. Interview / TL Answer
+- A 4-6 sentence answer the user can say directly: what it is, what we used, why,
+  the key trade-off, and one edge case or production concern.
+- It should sound confident and specific, showing real understanding, not a textbook
+  definition.
+
+## Rules
+
+- Never invent APIs, config keys or behaviour. If something was not checked in the code,
+  mark it as unverified.
+- Scale length to the question: a small concept gets short sections, but keep all five.
+- No filler or repeated points across sections.

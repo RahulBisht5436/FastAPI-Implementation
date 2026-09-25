@@ -1,0 +1,131 @@
+---
+description: Git commit and push policy — explicit permission required; end-of-chat summary suggestions
+alwaysApply: true
+---
+
+# Commit & Push Rules
+
+## Golden Rule
+
+**Never commit. Never push. Never stage files for commit.** Unless the user **explicitly** asks in the current message.
+
+- "Save the work" → **not** permission to commit
+- "Looks good" / "thanks" → **not** permission to commit
+- Finishing a task → **not** permission to commit
+- User rule elsewhere that says "don't commit unless asked" → this rule wins for this repo
+
+When unsure, **ask first**. Do not commit proactively "to be helpful."
+
+---
+
+## What Counts as Explicit Permission
+
+| User says | Allowed action |
+|-----------|----------------|
+| "commit" / "create a commit" / "git commit" | Stage relevant files and commit only |
+| "commit and push" / "push the commit" | Commit, then push to remote |
+| "push" (without prior commit in session) | Push **only** if commits already exist locally; never push uncommitted work without committing first when user asked to push changes |
+
+**Push requires its own explicit request.** A commit request alone does **not** authorize push.
+
+If the user asks only to commit, run `git status` after and tell them the branch is ready to push — do **not** push.
+
+---
+
+## End of Every Chat (Mandatory)
+
+Before ending your **final response** in a conversation where you changed code, include:
+
+### Suggested commit title
+One line, imperative mood, ≤72 chars. Focus on **why**, not a file list.
+
+### Suggested commit description
+2–4 sentences or short bullets covering:
+- What changed (behavior, not every filename)
+- Why it changed
+- Anything notable (breaking change, migration, follow-up)
+
+If there were **no code changes** in the session, omit this section.
+
+**This is a suggestion only.** Do not stage, commit, or push unless the user explicitly asks in a later message.
+
+Example format:
+
+```
+---
+**Suggested commit title:** fix trade-in modal validation on empty IMEI
+
+**Suggested description:** Guard submit when IMEI is blank and surface inline error instead of silent failure. Aligns with Complete Mobile checkout flow. No API changes.
+---
+```
+
+---
+
+## When Explicitly Asked to Commit
+
+Run in parallel first:
+- `git status`
+- `git diff` (staged + unstaged)
+- `git log -n 5 --oneline` (match repo style)
+
+Then:
+
+1. **Review** — Do not commit secrets (`.env`, keys, credentials). Warn if requested.
+2. **Stage** — Only files related to the work. Do not bundle unrelated changes.
+3. **Message** — 1–2 sentences, **why** over **what**. Match recent commit tone from `git log`.
+4. **Commit** — Use a HEREDOC for the message (PowerShell/bash-safe in this environment).
+5. **Verify** — `git status` after commit succeeds.
+
+### Git safety (never break these)
+
+- **Never** update git config
+- **Never** run destructive commands (`push --force`, `reset --hard`, etc.) unless user explicitly requests
+- **Never** force-push to `main` / `master` — warn if requested
+- **Never** skip hooks (`--no-verify`, `--no-gpg-sign`) unless user explicitly requests
+- **Never** use interactive git (`-i` flags)
+- **Avoid** `git commit --amend` unless ALL are true:
+  - User explicitly requested amend, **or** pre-commit hook modified files after a successful commit you created
+  - HEAD commit was created by you this session
+  - Commit has **not** been pushed
+- If commit **fails** or hook **rejects** → fix and create a **new** commit; do not amend
+- If already pushed → never amend unless user explicitly requests (needs force push)
+
+---
+
+## When Explicitly Asked to Push
+
+Only after commit succeeds (or user asked to push existing local commits):
+
+1. Confirm branch tracks a remote (`git status -sb`)
+2. `git push -u origin HEAD` if no upstream; otherwise `git push`
+3. Report result (remote URL / branch if helpful)
+
+Do **not** push unless the user explicitly asked to push in that message.
+
+---
+
+## Commit Message Quality
+
+- **Title:** imperative, concise — `fix`, `add`, `update`, `refactor`, `remove` (accurate verb)
+- **Body (optional):** context, trade-offs, ticket ID if project uses them
+- **Avoid:** "WIP", "misc changes", "fix stuff", listing every touched file with no meaning
+
+Read `git log` before writing; mirror this repo's conventions (scope prefixes, tense, length).
+
+---
+
+## Pull Requests
+
+Creating a PR is **not** the same as commit/push. Follow the user's PR workflow only when they explicitly ask to open a PR. PR creation may require push — still needs explicit push permission unless their message clearly includes it (e.g. "commit, push, and open a PR").
+
+---
+
+## Anti-patterns
+
+| Don't | Do |
+|-------|-----|
+| Commit at end of task without being asked | End with suggested title + description |
+| Push after commit unless push was requested | Tell user commit is done; they can ask to push |
+| Stage unrelated files "while you're at it" | Stage only relevant changes |
+| Amend after failed commit or after push | New commit, or ask user |
+| Commit `.env` or credential files | Warn and exclude |
