@@ -1,0 +1,7 @@
+{
+  "created_at": null,
+  "kb_manifest_hash": "60afd3d85768e4508bc294dd96e1096b99b54f01ada3b31b37f3239afe8aceb4",
+  "overall_scores": {},
+  "category_scores": {},
+  "notes": "Run `uv run ragas-eval --update-baseline` after the first successful full evaluation to populate scores."
+}
