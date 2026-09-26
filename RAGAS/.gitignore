@@ -3,3 +3,4 @@
 .pytest_cache/
 reports/
 uv.lock
+.ipynb_checkpoints/
